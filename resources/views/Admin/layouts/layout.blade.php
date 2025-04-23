@@ -29,6 +29,9 @@
     <!-- summernote -->
     <link rel="stylesheet" href="{{ asset('plugins/summernote/summernote-bs4.min.css') }}">
     {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
+
+    <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -113,7 +116,8 @@
                                 <div class="media-body">
                                     <h3 class="dropdown-item-title">
                                         John Pierce
-                                        <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>
+                                        <span class="float-right text-sm text-muted"><i
+                                                class="fas fa-star"></i></span>
                                     </h3>
                                     <p class="text-sm">I got your message bro</p>
                                     <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
@@ -268,6 +272,29 @@
                                 </a>
                             </li>
                         </ul>
+                        <li class="nav-item has-treeview">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-archive"></i>
+                                <p>
+                                    Статьи
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                        </li>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('posts.index') }}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Список статей</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('posts.create') }}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Создать статью</p>
+                                </a>
+                            </li>
+                        </ul>
                         <a href="#" class="nav-link active">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
                             <p>
@@ -355,6 +382,12 @@
     <script src="{{ asset('dist/js/demo.js') }}"></script>
     <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
     <script src="{{ asset('dist/js/pages/dashboard.js') }}"></script>
+    <script src="{{ asset('plugins/select2/js/select2.full.min.js') }}"></script>
+    <script>
+        $(function() {
+            $('.select2').select2()
+        })
+    </script>
 </body>
 
 </html>
