@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -26,14 +27,19 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required',
+            'title' => 'required|string',
             'description' => 'nullable|string',
             'content' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
             'tags' => 'nullable|array',
-            'tags.*' => 'nullable|integer|exists:tags,id'
+            'tags.*' => 'nullable|integer|exists:tags,id',
+            'thumbnail' => 'nullable|image',
         ]);
-        $post = Post::create($request->all());
+
+        $data = $request->all();
+
+        $data['thumbnail'] = Post::uploadImage($request);
+        $post = Post::create($data);
         if ($request->has('tags')) {
             $post->tags()->sync($request->tags);
         } else {
@@ -53,15 +59,18 @@ class PostController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'title' => 'required',
+            'title' => 'required|string',
             'description' => 'nullable|string',
             'content' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
             'tags' => 'nullable|array',
-            'tags.*' => 'nullable|integer|exists:tags,id'
+            'tags.*' => 'nullable|integer|exists:tags,id',
+            'thumbnail' => 'nullable|image',
         ]);
         $post = Post::find($id);
-        $post->update($request->all());
+        $data = $request->all();
+        $data['thumbnail'] = Post::uploadImage($request, $post->thumbnail);
+        $post->update($data);
 
         if ($request->has('tags')) {
             $post->tags()->sync($request->tags);
@@ -71,9 +80,16 @@ class PostController extends Controller
         return redirect()->route('posts.index')->with('success', 'Изменения сохранены!');
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        Post::destroy($id);
+        $post = Post::find($id);
+        if ($request->has('tags')) {
+            $post->tags()->sync($request->tags);
+        } else {
+            $post->tags()->sync([]);
+        }
+        Storage::delete($post->thumbnail);
+        $post->delete();
         return redirect()->route('posts.index')->with('success', 'Статья удалена!');
     }
 }

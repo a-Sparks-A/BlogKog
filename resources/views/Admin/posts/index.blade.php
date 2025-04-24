@@ -49,6 +49,10 @@
                                                 @foreach ($post as $p)
                                                     <tr>
                                                         <td>{{ $p->id }}</td>
+                                                        <td>
+                                                            <img src="{{ $p->getImage() }}" alt=""
+                                                                style="height: 50px;">
+                                                        </td>
                                                         <td>{{ $p->title }}</td>
                                                         <td>{{ $p->category->title }}</td>
                                                         <td>

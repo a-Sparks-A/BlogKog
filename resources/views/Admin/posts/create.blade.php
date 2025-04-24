@@ -30,7 +30,8 @@
                             </div>
                             <!-- /.card-header -->
 
-                            <form role="form" method="post" action="{{ route('posts.store') }}">
+                            <form role="form" method="post" action="{{ route('posts.store') }}"
+                                enctype="multipart/form-data">
                                 @csrf
                                 <div class="card-body">
                                     <div class="form-group">
@@ -70,7 +71,7 @@
                                             <div class="custom-file">
                                                 <input type="file" name="thumbnail" id="thumbnail"
                                                     class="custom-file-input">
-                                                <label for="thumbnail" class="custom-file-input">Выбрать файл</label>
+                                                <label for="thumbnail" class="custom-file-label">Выбрать файл</label>
                                             </div>
                                         </div>
                                     </div>
