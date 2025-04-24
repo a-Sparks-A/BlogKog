@@ -37,12 +37,13 @@
                                         <table class="table table-bordered table-hover text-nowrap">
                                             <thead>
                                                 <tr>
-                                                    <th style="width: 30px">#</th>
+                                                    <th style="width: 30px">№</th>
+                                                    <th>Изображение</th>
                                                     <th>Наименование</th>
                                                     <th>Категории</th>
                                                     <th>Теги</th>
                                                     <th>Дата</th>
-                                                    <th>Actions</th>
+                                                    <th>Действия</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
