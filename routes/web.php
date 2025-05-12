@@ -22,15 +22,22 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::group(['prefix' => 'admin', 'namespace' => 'Admin'], function () {
-    Route::get('/', [MainController::class, 'index'])->name('admin.index');
-});
+// Route::group(['prefix' => 'admin', 'namespace' => 'Admin'], function () {
 
-Route::group(['prefix' => 'admin'], function () {
+// });
+
+Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function () {
+    Route::get('/', [MainController::class, 'index'])->name('admin.index');
     Route::resource('/categories', CategoryController::class);
     Route::resource('/tags', TagController::class);
     Route::resource('/posts', PostController::class);
 });
 
-Route::get('/register', [UserController::class, 'create'])->name('register.create');
-Route::post('/register', [UserController::class, 'store'])->name('register.store');
+Route::group(['middleware' => 'guest'], function () {
+    Route::get('/register', [UserController::class, 'create'])->name('register.create');
+    Route::post('/register', [UserController::class, 'store'])->name('register.store');
+});
+
+Route::get('/login', [UserController::class, 'loginForm'])->name('login.create')->middleware('guest');
+Route::post('/login', [UserController::class, 'login'])->name('login');
+Route::get('/logout', [UserController::class, 'logout'])->name('logout')->middleware('auth');

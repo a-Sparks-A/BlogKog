@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
+use App\Models\Post;
+use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,10 +15,7 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        //
-    }
+    public function index() {}
 
     /**
      * Show the form for creating a new resource.
@@ -47,12 +47,36 @@ class UserController extends Controller
         return redirect()->route('home');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(User $user)
+    public function loginForm()
     {
-        //
+        return view('login.login');
+    }
+
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        if (Auth::attempt([
+            'email' => $request->email,
+            'password' => $request->password,
+        ])) {
+            session()->flash('success', 'You are logged');
+            if (Auth::user()->is_admin) {
+                return redirect()->route('admin.index');
+            } else {
+                return redirect()->route('home');
+            }
+        }
+        return redirect()->back()->with('error', 'Incorrect email or password');
+    }
+
+    public function logout()
+    {
+        Auth::logout();
+        return redirect()->route('login.create');
     }
 
     /**
