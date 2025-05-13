@@ -22,22 +22,28 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-// Route::group(['prefix' => 'admin', 'namespace' => 'Admin'], function () {
-
-// });
-
+//Админ-панель
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function () {
-    Route::get('/', [MainController::class, 'index'])->name('admin.index');
+    Route::get('/', [MainController::class, 'index'])->name('admin.index'); //Главная страница админки
+    //Управление контентом
     Route::resource('/categories', CategoryController::class);
     Route::resource('/tags', TagController::class);
     Route::resource('/posts', PostController::class);
 });
 
-Route::group(['middleware' => 'guest'], function () {
-    Route::get('/register', [UserController::class, 'create'])->name('register.create');
-    Route::post('/register', [UserController::class, 'store'])->name('register.store');
+Route::group(['middleware' => ['auth']], function () {
+    //Контент, доступный авторизованным пользователям
+    Route::get('/all-posts', [PostController::class, 'index'])->name('posts');
+    Route::get('/post/{id}', [PostController::class, 'show'])->name('posts.single');
+    Route::get('/all-category/{id}', [CategoryController::class, 'show'])->name('category.show');
+    Route::get('/all-tags/{id}', [TagController::class, 'show'])->name('tag.show');
+    Route::get('/logout', [UserController::class, 'logout'])->name('logout');
 });
 
-Route::get('/login', [UserController::class, 'loginForm'])->name('login.create')->middleware('guest');
-Route::post('/login', [UserController::class, 'login'])->name('login');
-Route::get('/logout', [UserController::class, 'logout'])->name('logout')->middleware('auth');
+Route::group(['middleware' => 'guest'], function () {
+    //Регистрация и авторизация
+    Route::get('/register', [UserController::class, 'create'])->name('register.create');
+    Route::post('/register', [UserController::class, 'store'])->name('register.store');
+    Route::get('/login', [UserController::class, 'loginForm'])->name('login.create');
+    Route::post('/login', [UserController::class, 'login'])->name('login');
+});

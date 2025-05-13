@@ -67,6 +67,11 @@
                                             <button type="submit" class="btn btn-primary btn-block">Войти</button>
                                         </div>
                                     </div>
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <a href="{{ route('register.create') }}">Зарегистрироваться</a>
+                                        </div>
+                                    </div>
                             </div>
                             </form>
 

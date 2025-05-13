@@ -99,6 +99,12 @@
                                             <button type="submit" class="btn btn-primary btn-block">Register</button>
                                         </div>
                                     </div>
+
+                                    <div class="row">
+                                        <div class="col-4">
+                                            <a href="{{ route('login.create') }}">Уже есть аккаунт</a>
+                                        </div>
+                                    </div>
                                 </form>
 
 

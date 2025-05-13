@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Post;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -30,7 +31,12 @@ class CategoryController extends Controller
 
     public function show(string $id)
     {
-        //
+        $category = Category::where('id', $id)->firstOrFail();
+        $posts = $category->posts()->orderBy('id', 'desc')->paginate(3);
+        $recentPosts = Post::latest()->limit(3)->get();
+        $popularPosts = Post::orderBy('views', 'desc')->limit(3)->get();
+        $allCategories = Category::withCount('posts')->get();
+        return view('admin.categories.show', compact('category', 'posts', 'recentPosts', 'popularPosts', 'allCategories'));
     }
 
     public function edit(string $id)

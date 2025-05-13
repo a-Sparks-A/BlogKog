@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
+use App\Models\Post;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 
@@ -30,7 +32,12 @@ class TagController extends Controller
 
     public function show(string $id)
     {
-        //
+        $tag = Tag::where('id', $id)->firstOrFail();
+        $posts = $tag->posts()->orderBy('id', 'desc')->paginate(3);
+        $recentPosts = Post::latest()->limit(3)->get();
+        $popularPosts = Post::orderBy('views', 'desc')->limit(3)->get();
+        $allCategories = Category::withCount('posts')->get();
+        return view('admin.tags.show', compact('tag', 'posts', 'recentPosts', 'popularPosts', 'allCategories'));
     }
 
     public function edit(string $id)
