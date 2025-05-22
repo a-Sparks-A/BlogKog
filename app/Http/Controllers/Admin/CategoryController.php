@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Post;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -31,12 +32,31 @@ class CategoryController extends Controller
 
     public function show(string $id)
     {
-        $category = Category::where('id', $id)->firstOrFail();
+        $category = Category::where('id', $id)->findOrFail($id);
         $posts = $category->posts()->orderBy('id', 'desc')->paginate(3);
         $recentPosts = Post::latest()->limit(3)->get();
         $popularPosts = Post::orderBy('views', 'desc')->limit(3)->get();
-        $allCategories = Category::withCount('posts')->get();
-        return view('admin.categories.show', compact('category', 'posts', 'recentPosts', 'popularPosts', 'allCategories'));
+        $allCategories = Category::withCount('posts')
+            ->orderBy('title')
+            ->get();
+        $allTags = Tag::withCount('posts')
+            ->orderBy('title')
+            ->get();
+
+        $popularTags = Tag::withCount('posts')
+            ->orderBy('posts_count', 'desc')
+            ->take(10)
+            ->get();
+
+        return view('admin.categories.show', compact(
+            'category',
+            'posts',
+            'recentPosts',
+            'popularPosts',
+            'allCategories',
+            'allTags',
+            'popularTags'
+        ));
     }
 
     public function edit(string $id)

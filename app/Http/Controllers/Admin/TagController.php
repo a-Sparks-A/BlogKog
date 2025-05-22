@@ -32,12 +32,33 @@ class TagController extends Controller
 
     public function show(string $id)
     {
-        $tag = Tag::where('id', $id)->firstOrFail();
+        $tag = Tag::where('id', $id)->findOrFail($id);
         $posts = $tag->posts()->orderBy('id', 'desc')->paginate(3);
         $recentPosts = Post::latest()->limit(3)->get();
         $popularPosts = Post::orderBy('views', 'desc')->limit(3)->get();
         $allCategories = Category::withCount('posts')->get();
-        return view('admin.tags.show', compact('tag', 'posts', 'recentPosts', 'popularPosts', 'allCategories'));
+
+
+        $allTags = Tag::withCount('posts')
+            ->orderBy('title')
+            ->get();
+
+
+        $popularTags = Tag::withCount('posts')
+            ->orderBy('posts_count', 'desc')
+            ->take(10)
+            ->get();
+
+
+        return view('admin.tags.show', compact(
+            'tag',
+            'posts',
+            'recentPosts',
+            'popularPosts',
+            'allCategories',
+            'allTags',
+            'popularTags'
+        ));
     }
 
     public function edit(string $id)

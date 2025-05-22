@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Site Metas -->
-    <title>Markedia - Marketing Blog Template</title>
+    <title>{{ $tag->title }} - Markedia</title> {{-- Более конкретный title --}}
     <meta name="keywords" content="">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -52,44 +52,16 @@
         .page-title {
             margin-top: 100px;
         }
+
+        .tag-selector {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 
 <body>
     <div id="wrapper">
-        <header class="market-header header">
-            <div class="container-fluid">
-                <nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
-                    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
-                        data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false"
-                        aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <a class="navbar-brand" href="{{ route('home') }}"><img
-                            src="{{ asset('images/version/market-logo.png') }}" alt=""></a>
-                    <div class="collapse navbar-collapse" id="navbarCollapse">
-                        <ul class="navbar-nav mr-auto">
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('home') }}">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('posts') }}">Blog</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('login.create') }}">Login</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('register.create') }}">Register</a>
-                            </li>
-                        </ul>
-                        <form class="form-inline">
-                            <input class="form-control mr-sm-2" type="text" placeholder="How may I help?">
-                            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                        </form>
-                    </div>
-                </nav>
-            </div><!-- end container-fluid -->
-        </header><!-- end market-header -->
+        @include('admin.layouts.header')
 
         <div class="page-title db">
             <div class="container">
@@ -106,54 +78,30 @@
         <section class="section lb">
             <div class="container">
                 <div class="row">
-                    <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
-                        <div class="sidebar">
-                            <div class="widget">
-                                <h2 class="widget-title">Recent Posts</h2>
-                                <div class="blog-list-widget">
-                                    <div class="list-group">
-                                        @foreach ($recentPosts ?? [] as $recentPost)
-                                            <a href="{{ route('posts.single', ['id' => $recentPost->id]) }}"
-                                                class="list-group-item list-group-item-action flex-column align-items-start">
-                                                <div class="w-100 justify-content-between">
-                                                    <img src="{{ $recentPost->getImage() }}" alt=""
-                                                        class="img-fluid float-left">
-                                                    <h5 class="mb-1">{{ $recentPost->title }}</h5>
-                                                    <small>{{ $recentPost->created_at->format('d M, Y') }}</small>
-                                                </div>
-                                            </a>
-                                        @endforeach
-                                    </div>
-                                </div><!-- end blog-list -->
-                            </div><!-- end widget -->
-
-                            <div id="" class="widget">
-                                <h2 class="widget-title">Advertising</h2>
-                                <div class="banner-spot clearfix">
-                                    <div class="banner-img">
-                                        <img src="{{ asset('upload/banner_03.jpg') }}" alt=""
-                                            class="img-fluid">
-                                    </div><!-- end banner-img -->
-                                </div><!-- end banner -->
-                            </div><!-- end widget -->
-
-                            <div class="widget">
-                                <h2 class="widget-title">Popular Tags</h2>
-                                <div class="link-widget">
-                                    <ul>
-                                        @foreach ($popularTags ?? [] as $t)
-                                            <li><a href="{{ route('tag.show', ['id' => $t->id]) }}">{{ $t->title }}
-                                                    <span>({{ $t->posts_count ?? 0 }})</span></a></li>
-                                        @endforeach
-                                    </ul>
-                                </div><!-- end link-widget -->
-                            </div><!-- end widget -->
-                        </div><!-- end sidebar -->
-                    </div><!-- end col -->
-
-
                     <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
                         <div class="page-wrapper">
+                            @if (isset($allTags) && $allTags->count() > 1)
+                                <div class="tag-selector">
+                                    <form>
+                                        <div class="form-group">
+                                            <label for="tag_select">Посмотреть другой тег:</label>
+                                            <select name="tag_id" id="tag_select" class="form-control"
+                                                onchange="if (this.value) window.location.href=this.value;">
+                                                <option value="">Выберите тег...</option>
+                                                @foreach ($allTags as $tagItem)
+                                                    @if ($tagItem->id != $tag->id)
+                                                        <option
+                                                            value="{{ route('tag.show', ['id' => $tagItem->id]) }}">
+                                                            {{ $tagItem->title }}
+                                                        </option>
+                                                    @endif
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </form>
+                                </div>
+                            @endif
+
                             <div class="blog-custom-build">
                                 @if (count($posts))
                                     @foreach ($posts as $post)
@@ -166,10 +114,8 @@
                                                     <div class="hovereffect">
                                                         <span></span>
                                                     </div>
-                                                    <!-- end hover -->
                                                 </a>
                                             </div>
-                                            <!-- end media -->
                                             <div class="blog-meta big-meta text-center">
                                                 <div class="post-sharing">
                                                     <ul class="list-inline">
@@ -179,26 +125,26 @@
                                                         </li>
                                                         <li><a href="#" class="tw-button btn btn-primary"><i
                                                                     class="fa fa-twitter"></i> <span
-                                                                    class="down-mobile">Tweet on Twitter</span></a>
-                                                        </li>
+                                                                    class="down-mobile">Tweet on Twitter</span></a></li>
                                                         <li><a href="#" class="gp-button btn btn-primary"><i
                                                                     class="fa fa-google-plus"></i></a></li>
                                                     </ul>
-                                                </div><!-- end post-sharing -->
+                                                </div>
                                                 <h4><a href="{{ route('posts.single', ['id' => $post->id]) }}"
                                                         title="">{{ $post->title }}</a></h4>
                                                 <p>{{ Str::limit(strip_tags($post->content), 200) }}</p>
-                                                <small><a
-                                                        href="{{ route('category.show', ['id' => $post->category->id]) }}"
-                                                        title="">{{ $post->category->title }}</a></small>
+                                                @if ($post->category)
+                                                    <small><a
+                                                            href="{{ route('category.show', ['id' => $post->category->id]) }}"
+                                                            title="">{{ $post->category->title }}</a></small>
+                                                @endif
                                                 <small><a href="{{ route('posts.single', ['id' => $post->id]) }}"
                                                         title="">{{ $post->created_at->format('d F, Y') }}</a></small>
                                                 <small><a href="#" title="">by Admin</a></small>
                                                 <small><a href="#" title=""><i class="fa fa-eye"></i>
                                                         {{ $post->views }}</a></small>
-                                            </div><!-- end meta -->
-                                        </div><!-- end blog-box -->
-
+                                            </div>
+                                        </div>
                                         <hr class="invis">
                                     @endforeach
                                 @else
@@ -216,9 +162,55 @@
                                 <nav aria-label="Page navigation">
                                     {{ $posts->links('pagination::bootstrap-4') }}
                                 </nav>
-                            </div><!-- end col -->
-                        </div><!-- end row -->
-                    </div><!-- end col -->
+                            </div>
+                        </div>
+                    </div><!-- end col-lg-8 -->
+
+                    <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+                        <div class="sidebar">
+                            <div class="widget">
+                                <h2 class="widget-title">Recent Posts</h2>
+                                <div class="blog-list-widget">
+                                    <div class="list-group">
+                                        @foreach ($recentPosts ?? [] as $recentPost)
+                                            <a href="{{ route('posts.single', ['id' => $recentPost->id]) }}"
+                                                class="list-group-item list-group-item-action flex-column align-items-start">
+                                                <div class="w-100 justify-content-between">
+                                                    <img src="{{ $recentPost->getImage() }}"
+                                                        alt="{{ $recentPost->title }}" class="img-fluid float-left">
+                                                    <h5 class="mb-1">{{ $recentPost->title }}</h5>
+                                                    <small>{{ $recentPost->created_at->format('d M, Y') }}</small>
+                                                </div>
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                </div><!-- end blog-list -->
+                            </div><!-- end widget -->
+
+                            <div class="widget">
+                                <h2 class="widget-title">Advertising</h2>
+                                <div class="banner-spot clearfix">
+                                    <div class="banner-img">
+                                        <img src="{{ asset('upload/banner_03.jpg') }}" alt=""
+                                            class="img-fluid">
+                                    </div><!-- end banner-img -->
+                                </div><!-- end banner -->
+                            </div><!-- end widget -->
+
+                            <div class="widget">
+                                <h2 class="widget-title">Popular Tags</h2>
+                                <div class="link-widget">
+                                    <ul>
+                                        @foreach ($popularTags ?? ($allTags ?? []) as $t)
+                                            <li><a href="{{ route('tag.show', ['id' => $t->id]) }}">{{ $t->title }}
+                                                    <span>({{ $t->posts_count ?? $t->posts->count() }})</span></a></li>
+                                        @endforeach
+                                    </ul>
+                                </div><!-- end link-widget -->
+                            </div><!-- end widget -->
+                        </div><!-- end sidebar -->
+                    </div><!-- end col-lg-4 -->
+
                 </div><!-- end row -->
             </div><!-- end container -->
         </section>
@@ -277,9 +269,9 @@
                             <h2 class="widget-title">Popular Tags</h2>
                             <div class="link-widget">
                                 <ul>
-                                    @foreach ($popularTags ?? [] as $t)
+                                    @foreach ($popularTags ?? ($allTags ?? []) as $t)
                                         <li><a href="{{ route('tag.show', ['id' => $t->id]) }}">{{ $t->title }}
-                                                <span>({{ $t->posts_count ?? 0 }})</span></a></li>
+                                                <span>({{ $t->posts_count ?? $t->posts->count() }})</span></a></li>
                                     @endforeach
                                 </ul>
                             </div><!-- end link-widget -->
@@ -298,4 +290,27 @@
         </footer><!-- end footer -->
 
         <div class="dmtop">Scroll to Top</div>
-    </div><!-- en
+    </div><!-- end wrapper -->
+
+    <!-- Core JavaScript
+    ================================================== -->
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <script src="{{ asset('js/tether.min.js') }}"></script>
+    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('js/animate.js') }}"></script>
+    <script src="{{ asset('js/custom.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tagSelect = document.getElementById('tag_select');
+            if (tagSelect) {
+                tagSelect.addEventListener('change', function() {
+                    if (this.value) {
+                        window.location.href = this.value;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

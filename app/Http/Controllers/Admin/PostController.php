@@ -13,11 +13,11 @@ class PostController extends Controller
 {
     public function index()
     {
-        $post = Post::with('category')->orderBy('id', 'desc')->paginate(30);
+        $posts = Post::with('category')->orderBy('id', 'desc')->paginate(30);
         $recentPosts = Post::latest()->limit(3)->get();
         $popularPosts = Post::orderBy('views', 'desc')->limit(3)->get();
-        $categories = Category::withCount('posts')->get();
-        return view('admin.posts.index', compact('post', 'recentPosts', 'popularPosts', 'categories'));
+        $allCategories = Category::withCount('posts')->orderBy('title')->get();
+        return view('admin.posts.index', compact('posts', 'recentPosts', 'popularPosts', 'allCategories'));
     }
 
     public function create()
@@ -96,26 +96,28 @@ class PostController extends Controller
         return redirect()->route('posts.index')->with('success', 'Статья удалена!');
     }
 
-    public function show(Request $request, $id)
+    public function show($id)
     {
         $post = Post::with(['category', 'tags'])->findOrFail($id);
+        $post->increment('views');
+        $recentPosts = Post::where('id', '!=', $post->id)->latest()->limit(3)->get();
+        $popularPosts = Post::where('id', '!=', $post->id)->orderBy('views', 'desc')->limit(3)->get();
 
-        // Увеличиваем счетчик просмотров
-        $post->views += 1;
-        $post->update();
-
-        // Получаем связанные посты (например, из той же категории)
+        $allCategories = Category::withCount('posts')->orderBy('title')->get();
+        $allTags = Tag::withCount('posts')->orderBy('title')->get();
         $relatedPosts = Post::where('category_id', $post->category_id)
             ->where('id', '!=', $post->id)
+            ->latest()
             ->limit(2)
             ->get();
 
-        // Получаем последние посты для боковой панели
-        $recentPosts = Post::latest()->limit(3)->get();
-        $popularPosts = Post::orderBy('views', 'desc')->limit(3)->get();
-
-        // Получаем категории с количеством постов
-        $categories = Category::withCount('posts')->get();
-        return view('admin.posts.show', compact('post', 'relatedPosts', 'recentPosts', 'categories'));
+        return view('admin.posts.show', compact(
+            'post',
+            'relatedPosts',
+            'recentPosts',
+            'popularPosts',
+            'allCategories',
+            'allTags'
+        ));
     }
 }

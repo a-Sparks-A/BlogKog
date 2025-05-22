@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Post extends Model
 {
+    use HasFactory;
     use Sluggable;
 
     protected $fillable = ['title', 'description', 'content', 'category_id', 'slug', 'thumbnail'];
@@ -22,6 +23,15 @@ class Post extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+     public function scopeSearch($query, $searchTerm)
+    {
+        return $query->where(function ($subQuery) use ($searchTerm) {
+            $subQuery->where('title', 'LIKE', "%{$searchTerm}%")
+                     ->orWhere('description', 'LIKE', "%{$searchTerm}%")
+                     ->orWhere('content', 'LIKE', "%{$searchTerm}%");
+        });
     }
 
 

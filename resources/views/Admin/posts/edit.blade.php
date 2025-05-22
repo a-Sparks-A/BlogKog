@@ -30,7 +30,8 @@
                             </div>
                             <!-- /.card-header -->
 
-                            <form role="form" method="post" action="{{ route('posts.update', ['post' => $post->id]) }}" enctype="multipart/form-data">
+                            <form role="form" method="post" action="{{ route('posts.update', ['post' => $post->id]) }}"
+                                enctype="multipart/form-data">
                                 @csrf
                                 @method('PUT')
                                 <div class="card-body">
@@ -52,7 +53,9 @@
                                         <label for="category_id">Категория</label>
                                         <select name="category_id" id="category_id" class="form-control">
                                             @foreach ($categories as $k => $v)
-                                                <option value="{{ $k }}" @if($k == $post->category_id) selected @endif>{{ $v }}</option>
+                                                <option value="{{ $k }}"
+                                                    @if ($k == $post->category_id) selected @endif>{{ $v }}
+                                                </option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -61,14 +64,17 @@
                                         <select name="tags[]" id="tags" class="select2" multiple="multiple"
                                             data-placeholder="Выбор тегов" style="width: 100%;">
                                             @foreach ($tags as $k => $v)
-                                                <option value="{{ $k }}" @if(in_array($k, $post->tags->pluck('id')->toArray())) selected @endif>{{ $v }}</option>
+                                                <option value="{{ $k }}"
+                                                    @if (in_array($k, $post->tags->pluck('id')->toArray())) selected @endif>{{ $v }}
+                                                </option>
                                             @endforeach
                                         </select>
                                     </div>
                                     <div class="form-group">
                                         <label for="thumbnail">Изображение</label>
                                         <div>
-                                            <img src="{{ $post->thumbnail }}" alt="" class="img-thumbnail mb-2" width="200">
+                                            <img src="{{ $post->thumbnail }}" alt="" class="img-thumbnail mb-2"
+                                                width="200">
                                         </div>
                                         <div class="input-group">
                                             <div class="custom-file">
@@ -77,6 +83,9 @@
                                                 <label class="custom-file-label" for="thumbnail">Выбрать файл</label>
                                             </div>
                                         </div>
+                                        @if ($post->getImage())
+                                            <img src="{{ $post->getImage() }}" alt="Текущее изображение"
+                                                class="img-thumbnail mt-2" width="200">
                                     </div>
                                 </div>
                                 <!-- /.card-body -->
