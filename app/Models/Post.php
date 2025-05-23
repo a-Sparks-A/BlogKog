@@ -25,16 +25,6 @@ class Post extends Model
         return $this->belongsTo(Category::class);
     }
 
-     public function scopeSearch($query, $searchTerm)
-    {
-        return $query->where(function ($subQuery) use ($searchTerm) {
-            $subQuery->where('title', 'LIKE', "%{$searchTerm}%")
-                     ->orWhere('description', 'LIKE', "%{$searchTerm}%")
-                     ->orWhere('content', 'LIKE', "%{$searchTerm}%");
-        });
-    }
-
-
     public function sluggable(): array
     {
         return [
@@ -62,5 +52,10 @@ class Post extends Model
             return asset("uploads/no-image.png");
         }
         return asset("uploads/{$this->thumbnail}");
+    }
+
+    public function scopeLike($query, $s)
+    {
+        return $query->where('title', 'LIKE', "%{$s}%");
     }
 }
