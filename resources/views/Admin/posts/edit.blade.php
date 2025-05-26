@@ -86,6 +86,7 @@
                                         @if ($post->getImage())
                                             <img src="{{ $post->getImage() }}" alt="Текущее изображение"
                                                 class="img-thumbnail mt-2" width="200">
+                                        @endif
                                     </div>
                                 </div>
                                 <!-- /.card-body -->

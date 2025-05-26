@@ -11,16 +11,13 @@
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('home') }}">Главная</a>
+                        <a class="nav-link" href="{{ route('posts') }}">Главная</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/all-category/1">Категории</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/all-tags/1">Теги</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('posts') }}">Блог</a>
                     </li>
                 </ul>
                 <form class="form-inline" method="GET" action="{{ route('search') }}">

@@ -49,3 +49,7 @@ Route::group(['middleware' => 'guest'], function () {
     Route::get('/login', [UserController::class, 'loginForm'])->name('login.create');
     Route::post('/login', [UserController::class, 'login'])->name('login');
 });
+
+
+//qu@gmail.com - 111 -- админ
+//ww@gmail.com - 999 -- не админ

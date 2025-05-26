@@ -38,23 +38,35 @@
                                         <label for="title">Название</label>
                                         <input type="text" name="title"
                                             class="form-control @error('title') is-invalid @enderror" id="title"
-                                            placeholder="Название">
+                                            placeholder="Название" value="{{ old('title') }}">
+                                        @error('title')
+                                            <div class="text-danger">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                     <div class="form-group">
                                         <label for="description">Цитата</label>
-                                        <textarea name="description" id="description" rows="3" class="form-control" placeholder="Цитата..."></textarea>
+                                        <textarea name="description" id="description" rows="3" class="form-control" placeholder="Цитата...">{{ old('description') }}</textarea>
+                                        @error('description')
+                                            <div class="text-danger">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                     <div class="form-group">
                                         <label for="content">Контент</label>
-                                        <textarea name="content" id="content" rows="3" class="form-control" placeholder="Контент..."></textarea>
+                                        <textarea name="content" id="content" rows="3" class="form-control" placeholder="Контент...">{{ old('content') }}</textarea>
+                                        @error('content')
+                                            <div class="text-danger">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                     <div class="form-group">
                                         <label for="category_id">Категория</label>
                                         <select name="category_id" id="category_id" class="form-control">
                                             @foreach ($categories as $k => $v)
-                                                <option value="{{ $k }}">{{ $v }}</option>
+                                                <option value="{{ $k }} ">{{ $v }}</option>
                                             @endforeach
                                         </select>
+                                        @error('category_id')
+                                            <div class="text-danger">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                     <div class="form-group">
                                         <label for="tags">Теги</label>
@@ -64,6 +76,9 @@
                                                 <option value="{{ $k }}">{{ $v }}</option>
                                             @endforeach
                                         </select>
+                                        @error('tags')
+                                            <div class="text-danger">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                     <div class="form-group">
                                         <label for="thumbnail">Изображение</label>

@@ -30,13 +30,24 @@
         .category-selector-wrapper {
             margin-bottom: 30px;
         }
+
+        .admin-post-actions {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .admin-post-actions .btn {
+            padding: 8px 15px;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 
 <body>
     <div id="wrapper">
         @include('admin.layouts.header')
-
         <section id="cta" class="section">
             <div class="container">
                 <div class="row">
@@ -53,6 +64,7 @@
                             <h3>Subscribe Today!</h3>
                             <p>Subscribe to our weekly Newsletter and receive updates via email.</p>
                             <form class="form-inline" method="post">
+                                @csrf
                                 <input type="text" name="email" placeholder="Add your email here.." required
                                     class="form-control" />
                                 <input type="submit" value="Subscribe" class="btn btn-default btn-block" />
@@ -76,7 +88,7 @@
                                             <label for="category_select">View posts by category:</label>
                                             <select name="category_id" id="category_select" class="form-control"
                                                 onchange="if (this.value) window.location.href=this.value;">
-                                                <option value="{{ url('/') }}">All Categories</option>
+                                                <option value="{{ url('/') }}">Все категории</option>
                                                 @foreach ($allCategories as $catItem)
                                                     <option
                                                         value="{{ route('category.show', ['id' => $catItem->id]) }}"
@@ -91,8 +103,8 @@
                             @endif
 
                             <div class="blog-custom-build">
-                                @if (isset($post) && $post->count() > 0)
-                                    @foreach ($post as $p)
+                                @if (isset($posts) && $posts->count() > 0)
+                                    @foreach ($posts as $p)
                                         <div class="blog-box wow fadeIn">
                                             <div class="post-media">
                                                 <a href="{{ route('posts.single', ['id' => $p->id]) }}"
@@ -120,23 +132,44 @@
                                                 </div>
                                                 <h4><a href="{{ route('posts.single', ['id' => $p->id]) }}"
                                                         title="{{ $p->title }}">{{ $p->title }}</a></h4>
-                                                <p>{{ Str::limit(strip_tags($p->content), 200) }}</p>
+                                                <p>{{ Str::limit(strip_tags($p->content ?? ''), 200) }}</p>
+                                                @auth
+                                                    @if (Auth::user()->isAdmin())
+                                                        <div class="admin-post-actions">
+                                                            <a href="{{ route('posts.edit', ['post' => $p->id]) }}"
+                                                                class="btn btn-warning btn-sm">
+                                                                <i class="fa fa-pencil"></i> Edit
+                                                            </a>
+                                                            <form action="{{ route('posts.destroy', ['post' => $p->id]) }}"
+                                                                method="POST"
+                                                                onsubmit="return confirm('Are you sure you want to delete this post?');">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                                    <i class="fa fa-trash-o"></i> Delete
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    @endif
+                                                @endauth
                                                 @if ($p->category)
                                                     <small><a
                                                             href="{{ route('category.show', ['id' => $p->category->id]) }}"
                                                             title="{{ $p->category->title }}">{{ $p->category->title }}</a></small>
                                                 @endif
                                                 <small><a href="{{ route('posts.single', ['id' => $p->id]) }}"
-                                                        title="">{{ $p->created_at->format('d F, Y') }}</a></small>
+                                                        title="">{{ $p->created_at ? $p->created_at->format('d F, Y') : 'N/A Date' }}</a></small>
                                                 <small><a href="#" title="">by Admin</a></small>
                                                 <small><a href="#" title=""><i class="fa fa-eye"></i>
-                                                        {{ $p->views }}</a></small>
+                                                        {{ $p->views ?? 0 }}</a></small>
                                             </div>
                                         </div>
                                         <hr class="invis">
                                     @endforeach
                                 @else
-                                    <p>No posts found.</p>
+                                    <div class="alert alert-info text-center" role="alert">
+                                        No posts found. Please check back later!
+                                    </div>
                                 @endif
                             </div>
                         </div>
@@ -146,8 +179,8 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <nav aria-label="Page navigation">
-                                    @if (isset($post) && $post->count() > 0)
-                                        {{ $post->links('pagination::bootstrap-4') }}
+                                    @if (isset($posts) && $posts->count() > 0)
+                                        {{ $posts->links('pagination::bootstrap-4') }}
                                     @endif
                                 </nav>
                             </div>
@@ -166,17 +199,19 @@
                             <h2 class="widget-title">Recent Posts</h2>
                             <div class="blog-list-widget">
                                 <div class="list-group">
-                                    @foreach ($recentPosts ?? [] as $recentPost)
+                                    @forelse ($recentPosts ?? [] as $recentPost)
                                         <a href="{{ route('posts.single', ['id' => $recentPost->id]) }}"
                                             class="list-group-item list-group-item-action flex-column align-items-start">
                                             <div class="w-100 justify-content-between">
                                                 <img src="{{ $recentPost->getImage() }}"
                                                     alt="{{ $recentPost->title }}" class="img-fluid float-left">
                                                 <h5 class="mb-1">{{ $recentPost->title }}</h5>
-                                                <small>{{ $recentPost->created_at->format('d M, Y') }}</small>
+                                                <small>{{ $recentPost->created_at ? $recentPost->created_at->format('d M, Y') : 'N/A Date' }}</small>
                                             </div>
                                         </a>
-                                    @endforeach
+                                    @empty
+                                        <p>No recent posts available.</p>
+                                    @endforelse
                                 </div>
                             </div>
                         </div>
@@ -187,7 +222,7 @@
                             <h2 class="widget-title">Popular Posts</h2>
                             <div class="blog-list-widget">
                                 <div class="list-group">
-                                    @foreach ($popularPosts ?? [] as $popularPost)
+                                    @forelse ($popularPosts ?? [] as $popularPost)
                                         <a href="{{ route('posts.single', ['id' => $popularPost->id]) }}"
                                             class="list-group-item list-group-item-action flex-column align-items-start">
                                             <div class="w-100 justify-content-between">
@@ -201,7 +236,9 @@
                                                 </span>
                                             </div>
                                         </a>
-                                    @endforeach
+                                    @empty
+                                        <p>No popular posts available.</p>
+                                    @endforelse
                                 </div>
                             </div>
                         </div>
@@ -212,11 +249,13 @@
                             <h2 class="widget-title">Popular Categories</h2>
                             <div class="link-widget">
                                 <ul>
-                                    @foreach ($categories ?? ($allCategories ?? []) as $category)
+                                    @forelse ($allCategories ?? [] as $category)
                                         <li><a href="{{ route('category.show', ['id' => $category->id]) }}">{{ $category->title }}
                                                 <span>({{ $category->posts_count ?? ($category->posts ? $category->posts->count() : 0) }})</span></a>
                                         </li>
-                                    @endforeach
+                                    @empty
+                                        <li>No categories available.</li>
+                                    @endforelse
                                 </ul>
                             </div>
                         </div>
